@@ -1,0 +1,82 @@
+name: Update Public Release
+
+on:
+  repository_dispatch:
+    types: [new-installer-release]
+
+jobs:
+  publish-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Public Repo
+        uses: actions/checkout@v7
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v${{ github.event.client_payload.version }}
+          name: Release v${{ github.event.client_payload.version }}
+          body: |
+            ## What's New
+            ${{ github.event.client_payload.notes }}
+            
+            ## FireControl application v${{ github.event.client_payload.version }}
+            
+            Installers for this version have been generated and are ready for download.
+            
+            ### Installation Instructions
+            * **Windows**: Download and run the `.msi` installer.
+            * **macOS**: Download and run the `.pkg` installer.
+            * **Linux**: Install the `.deb` package using `sudo apt install ./firecontrol_${{ github.event.client_payload.version }}_amd64.deb`.
+            *(Note: Use the `./` prefix and path to the downloaded **deb** file when installing with apt)*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update release.json metadata
+        run: |
+          VERSION="${{ github.event.client_payload.version }}"
+          
+          # 1. Fetch the actual release data from GitHub API to get real asset URLs
+          # This ensures we get the exact filenames (including _amd64, etc.)
+          RELEASE_DATA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/v$VERSION")
+
+          # 2. Extract specific URLs using jq filters
+          WIN_URL=$(echo "$RELEASE_DATA" | jq -r '.assets[] | select(.name | endswith(".msi")) | .browser_download_url')
+          MAC_URL=$(echo "$RELEASE_DATA" | jq -r '.assets[] | select(.name | endswith(".pkg")) | .browser_download_url')
+          LINUX_URL=$(echo "$RELEASE_DATA" | jq -r '.assets[] | select(.name | endswith(".deb")) | .browser_download_url')
+          NOTES_URL="https://github.com/${{ github.repository }}/releases/tag/v$VERSION"
+
+          # 3. Calculate ReleaseType (same as before)
+          if [ -f release.json ]; then
+            OLD_VERSION=$(jq -r '.version // "0.0.0"' release.json)
+          else
+            OLD_VERSION="0.0.0"
+          fi
+          
+          IFS='.' read -r o1 o2 o3 <<< "$OLD_VERSION"
+          IFS='.' read -r n1 n2 n3 <<< "$VERSION"
+          if [ "$n1" -gt "$o1" ]; then TYPE="MAJOR"; elif [ "$n2" -gt "$o2" ]; then TYPE="MINOR"; else TYPE="PATCH"; fi
+
+          # 4. Generate the SoftwareRelease JSON with dynamic URLs
+          cat <<EOF > release.json
+          {
+            "version": "$VERSION",
+            "type": "$TYPE",
+            "releaseNotes": "$NOTES_URL",
+            "windowsInstallerUrl": "$WIN_URL",
+            "macInstallerUrl": "$MAC_URL",
+            "linuxInstallerUrl": "$LINUX_URL"
+          }
+          EOF
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add release.json
+          git commit -m "Update release metadata to v$VERSION" || echo "No changes"
+          git push
