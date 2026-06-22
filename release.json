@@ -1,0 +1,8 @@
+{
+  "version": "26.0.1",
+  "type": "MAJOR",
+  "releaseNotes": "https://github.com/langmuirsystems/firecontrol-public/releases/tag/v26.0.1",
+  "windowsInstallerUrl": "https://github.com/langmuirsystems/firecontrol-public/releases/download/v26.0.1/firecontrol-26.0.1-win-amd64.msi",
+  "macInstallerUrl": "https://github.com/langmuirsystems/firecontrol-public/releases/download/v26.0.1/firecontrol-26.0.1-mac-aarch64.pkg",
+  "linuxInstallerUrl": "https://github.com/langmuirsystems/firecontrol-public/releases/download/v26.0.1/firecontrol_26.0.1_amd64-linux-amd64.deb"
+}
