@@ -1,8 +1,8 @@
 {
-  "version": "26.1.0",
-  "type": "MINOR",
-  "releaseNotes": "https://github.com/langmuirsystems/firecontrol-public/releases/tag/v26.1.0",
-  "windowsInstallerUrl": "https://github.com/langmuirsystems/firecontrol-public/releases/download/v26.1.0/firecontrol-26.1.0-win-amd64.msi",
-  "macInstallerUrl": "https://github.com/langmuirsystems/firecontrol-public/releases/download/v26.1.0/firecontrol-26.1.0-mac-aarch64.pkg",
-  "linuxInstallerUrl": "https://github.com/langmuirsystems/firecontrol-public/releases/download/v26.1.0/firecontrol_26.1.0_amd64-linux-amd64.deb"
+  "version": "26.1.1",
+  "type": "PATCH",
+  "releaseNotes": "https://github.com/langmuirsystems/firecontrol-public/releases/tag/v26.1.1",
+  "windowsInstallerUrl": "https://github.com/langmuirsystems/firecontrol-public/releases/download/v26.1.1/firecontrol-26.1.1-win-amd64.msi",
+  "macInstallerUrl": "https://github.com/langmuirsystems/firecontrol-public/releases/download/v26.1.1/firecontrol-26.1.1-mac-aarch64.pkg",
+  "linuxInstallerUrl": "https://github.com/langmuirsystems/firecontrol-public/releases/download/v26.1.1/firecontrol_26.1.1_amd64-linux-amd64.deb"
 }
